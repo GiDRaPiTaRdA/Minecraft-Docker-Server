@@ -1,0 +1,18 @@
+[
+  {
+    "Name": "Build Version 26.3",
+    "Command": "JAVA_VERSION=25 MC_VERSION=26.3 docker compose -f build/compose.yml run --build --rm builder"
+  },
+  {
+    "Name": "Deploy Server 26.3",
+    "Command": "MC_VERSION=26.3; mkdir -p servers/\"$MC_VERSION\" && echo 'eula=true' > servers/\"$MC_VERSION/eula.txt\" && cp \"build/versions/$MC_VERSION/spigot-$MC_VERSION.jar\" servers/\"$MC_VERSION/spigot.jar\""
+  },
+  {
+    "Name": "Launch Server 26.3",
+    "Command": "JAVA_VERSION=25 MC_VERSION=26.3 docker compose -f servers/compose.yml run --rm --service-ports spigot" 
+  },
+  {
+    "Name": "chown Servers",
+    "Command": "sudo chown -R chriss:chriss ~/minecraft/servers" 
+  }
+]

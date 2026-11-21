@@ -1,0 +1,25 @@
+services:
+  spigot:
+    image: eclipse-temurin:${JAVA_VERSION:?Specify JAVA_VERSION}-jre
+    container_name: spigot-${MC_VERSION:?Specify MC_VERSION}
+    working_dir: /server
+
+    ports:
+      - "${PORT:-25565}:25565"
+
+    volumes:
+      - ./${MC_VERSION}:/server
+
+    command:
+      - java
+      - -Xms${MIN_RAM:-1G}
+      - -Xmx${MAX_RAM:-4G}
+      - -jar
+      - spigot.jar
+      - nogui
+
+    mem_limit: ${CONTAINER_RAM:-5g}
+    restart: no
+    stop_grace_period: 2m
+    stdin_open: true
+    tty: true

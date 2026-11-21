@@ -1,0 +1,24 @@
+services:
+  builder:
+    build:
+      context: .
+      args:
+        JAVA_VERSION: ${JAVA_VERSION:-25}
+
+    image: spigot-builder:java${JAVA_VERSION:-25}
+    working_dir: /build
+
+    volumes:
+      - ./versions/${MC_VERSION:?Specify MC_VERSION}:/build
+
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        set -e
+        curl -fL --retry 3 -o BuildTools.jar.tmp \
+          https://hub.spigotmc.org/jenkins/job/BuildTools/lastSuccessfulBuild/artifact/target/BuildTools.jar
+        mv BuildTools.jar.tmp BuildTools.jar
+        exec java -jar BuildTools.jar --rev "$$MC_VERSION"
+
+    environment:
+      MC_VERSION: ${MC_VERSION:?Specify MC_VERSION}
