@@ -1,18 +1,54 @@
-[
-  {
-    "Name": "Build Version 26.3",
-    "Command": "JAVA_VERSION=25 MC_VERSION=26.3 docker compose -f build/compose.yml run --build --rm builder"
-  },
-  {
-    "Name": "Deploy Server 26.3",
-    "Command": "MC_VERSION=26.3; mkdir -p servers/\"$MC_VERSION\" && echo 'eula=true' > servers/\"$MC_VERSION/eula.txt\" && cp \"build/versions/$MC_VERSION/spigot-$MC_VERSION.jar\" servers/\"$MC_VERSION/spigot.jar\""
-  },
-  {
-    "Name": "Launch Server 26.3",
-    "Command": "JAVA_VERSION=25 MC_VERSION=26.3 docker compose -f servers/compose.yml run --rm --service-ports spigot" 
-  },
-  {
-    "Name": "chown Servers",
-    "Command": "sudo chown -R chriss:chriss ~/minecraft/servers" 
-  }
-]
+{
+  "Name": "Minecraft project",
+  "Description": "Build, deploy, launch, and maintain a Minecraft Spigot server using Docker Compose.",
+  "Children": [
+    {
+      "Name": "Build Version 26.3",
+      "Description": "Build the Spigot 26.3 JAR using Java 25 and Docker Compose.",
+      "Command": "JAVA_VERSION=25 MC_VERSION=26.3 docker compose -f build/compose.yml run --build --rm builder"
+    },
+    {
+      "Name": "Deploy Server 26.3",
+      "Description": "Prepare the server directory, accept the Minecraft EULA, and copy the built Spigot JAR.",
+      "Command": [
+        "MC_VERSION=26.3 &&",
+        "mkdir -p server/versions/\"$MC_VERSION\" &&",
+        "echo 'eula=true' > server/versions/\"$MC_VERSION/eula.txt\" &&",
+        "cp \"build/versions/$MC_VERSION/spigot-$MC_VERSION.jar\" server/versions/\"$MC_VERSION/spigot.jar\""
+      ]
+    },
+    {
+      "Name": "Launch Server 26.3",
+      "Description": "Start Spigot interactively using the server Compose file and published ports.",
+      "Command": "JAVA_VERSION=25 MC_VERSION=26.3 docker compose -f server/compose.yml run --rm --service-ports spigot"
+    },
+    {
+      "Name": "Chown Servers",
+      "Description": "Give chriss ownership of the Minecraft server directory and its contents.",
+      "Command": "sudo chown -R chriss:chriss ~/minecraft/server"
+    },
+    {
+      "Name": "Set SSH Docker Config",
+      "Description": "Set Docker's alternate config directory for this command's shell only; it will not persist in your original terminal.",
+      "Command": "export DOCKER_CONFIG=\"$HOME/.docker-ssh\""
+    },
+    {
+      "Name": "Cleanup Build Versions",
+      "Description": "Permanently delete all generated versions under build/versions after confirmation, keeping the parent directory.",
+      "Command": [
+        "read -r -p 'Delete all built Minecraft versions? [y/N] ' confirm &&",
+        "[[ \"$confirm\" == \"y\" ]] &&",
+        "sudo find build/versions -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +"
+      ]
+    },
+    {
+      "Name": "Cleanup Server Versions",
+      "Description": "Permanently delete all deployed server versions, worlds, and configuration under server/versions after confirmation.",
+      "Command": [
+        "read -r -p 'Delete ALL deployed Minecraft servers and worlds? [y/N] ' confirm &&",
+        "[[ \"$confirm\" == \"y\" ]] &&",
+        "sudo find server/versions -mindepth 1 -maxdepth 1 -exec rm -rf -- {} +"
+      ]
+    }
+  ]
+}

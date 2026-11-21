@@ -1,0 +1,5 @@
+# Generated Minecraft build artifacts
+/build/versions/
+
+# Deployed Minecraft servers and world data
+/server/versions/

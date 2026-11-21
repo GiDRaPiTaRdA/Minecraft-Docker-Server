@@ -8,7 +8,7 @@ services:
       - "${PORT:-25565}:25565"
 
     volumes:
-      - ./${MC_VERSION}:/server
+      - ./versions/${MC_VERSION}:/server
 
     command:
       - java
@@ -19,7 +19,7 @@ services:
       - nogui
 
     mem_limit: ${CONTAINER_RAM:-5g}
-    restart: no
+    restart: unless-stopped
     stop_grace_period: 2m
     stdin_open: true
     tty: true
